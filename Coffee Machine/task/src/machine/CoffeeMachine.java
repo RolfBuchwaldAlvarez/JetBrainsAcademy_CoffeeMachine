@@ -1,14 +1,47 @@
 package machine;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 
 public class CoffeeMachine {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
+        System.out.println("Write how many ml of water the coffee machine has:");
+        int remainingWater = sc.nextInt();
+        System.out.println("Write how many ml of milk the coffee machine has:");
+        int remainingMilk = sc.nextInt();
+        System.out.println("Write how many grams of coffee beans the coffee machine has:");
+        int remainingCoffeeBeans = sc.nextInt();
         System.out.println("Write how many cups of coffee you will need:");
         int cupsOfCoffeeNeeded = sc.nextInt();
         System.out.println("For " + cupsOfCoffeeNeeded + " cups of coffee you will need:");
-        calculateIngredients(cupsOfCoffeeNeeded);
+        checkIfEnoughResourcesForCoffeeNeeded(cupsOfCoffeeNeeded, remainingWater, remainingMilk, remainingCoffeeBeans);
+    }
+
+    public static void checkIfEnoughResourcesForCoffeeNeeded(int cupsOfCoffeeNeeded, int remainingWater,
+                                                             int remainingMilk, int remainingCoffeeBeans) {
+        int cupsFromWater = remainingWater / 200;
+        int cupsFromMilk = remainingMilk / 50;
+        int cupsFromBeans = remainingCoffeeBeans / 15;
+
+        List<Integer> list = new ArrayList<>();
+        list.add(cupsFromWater);
+        list.add(cupsFromMilk);
+        list.add(cupsFromBeans);
+
+        int min = Collections.min(list);
+
+        if (min == cupsOfCoffeeNeeded) {
+            System.out.println("Yes, I can make that amount of coffee");
+        } else if (min > cupsOfCoffeeNeeded){
+            int excessCups = min - cupsOfCoffeeNeeded;
+            System.out.println("Yes, I can make that amount of coffee (and even " + excessCups +
+                " more than that");
+        } else {
+            System.out.println("No, I can make only " + min + " cup(s) of coffee");
+        }
     }
 
     public static void calculateIngredients(int cupsOfCoffeeNeeded) {
