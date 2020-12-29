@@ -6,65 +6,41 @@ import java.util.List;
 import java.util.Scanner;
 
 public class CoffeeMachine {
+    private static int water = 400;
+    private static int milk = 540;
+    private static int coffeeBeans = 120;
+    private static int cups = 9;
+    private static int change = 550;
+
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-
-        int water = 400;
-        int milk = 540;
-        int coffeeBeans = 120;
-        int cups = 9;
-        int change = 550;
 
         printCoffeeMachineState(water, milk, coffeeBeans, cups, change);
         System.out.println("Write action (buy, fill, take):");
         String action = sc.nextLine();
 
         switch (action) {
-            case "buy": int selection = buyCoffee(sc);
+            case "buy": buyCoffee(sc);
                         System.out.println();
-                        switch (selection) {
-                            case 1: water -= 250;
-                                    coffeeBeans -= 16;
-                                    cups -= 1;
-                                    change += 4;
-                                    break;
-                            case 2: water -= 350;
-                                    milk -= 75;
-                                    coffeeBeans -= 20;
-                                    cups -= 1;
-                                    change += 7;
-                                    break;
-                            case 3: water -= 200;
-                                    milk -= 100;
-                                    coffeeBeans -= 12;
-                                    cups -= 1;
-                                    change += 6;
-                                    break;
-                            default: break;
-                        }
                         printCoffeeMachineState(water, milk, coffeeBeans, cups, change);
                         break;
-            case "fill": List<Integer> refillList = refillCoffeeMachine(sc);
-                         water += refillList.get(0);
-                         milk += refillList.get(1);
-                         coffeeBeans += refillList.get(2);
-                         cups += refillList.get(3);
+            case "fill": refillCoffeeMachine(sc);
                          printCoffeeMachineState(water, milk, coffeeBeans, cups, change);
                          break;
-            case "take": collectMoney(change);
-                         change = 0;
+            case "take": collectMoney();
                          printCoffeeMachineState(water, milk, coffeeBeans, cups, change);
                          break;
             default: break;
         }
     }
 
-    public static void collectMoney(int change) {
+    public static void collectMoney() {
         System.out.println("I gave you $" + change);
         System.out.println();
+        change = 0;
     }
 
-    public static List<Integer> refillCoffeeMachine(Scanner sc) {
+    public static void refillCoffeeMachine(Scanner sc) {
         System.out.println("Write how many ml of water do you want to add:");
         int waterRefill = sc.nextInt();
         System.out.println("Write how many ml of milk do you want to add:");
@@ -74,18 +50,42 @@ public class CoffeeMachine {
         System.out.println("Write how many disposable cups of coffee do you want to add:");
         int cupsRefill = sc.nextInt();
 
-        List<Integer> list = new ArrayList<>();
-        list.add(waterRefill);
-        list.add(milkRefill);
-        list.add(coffeeBeansRefill);
-        list.add(cupsRefill);
+        List<Integer> refillList = new ArrayList<>();
+        refillList.add(waterRefill);
+        refillList.add(milkRefill);
+        refillList.add(coffeeBeansRefill);
+        refillList.add(cupsRefill);
 
-        return list;
+        water += refillList.get(0);
+        milk += refillList.get(1);
+        coffeeBeans += refillList.get(2);
+        cups += refillList.get(3);
     }
 
-    public static int buyCoffee(Scanner sc) {
+    public static void buyCoffee(Scanner sc) {
         System.out.println("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino");
-        return sc.nextInt();
+        int selection = sc.nextInt();
+
+        switch (selection) {
+            case 1: water -= 250;
+                coffeeBeans -= 16;
+                cups -= 1;
+                change += 4;
+                break;
+            case 2: water -= 350;
+                milk -= 75;
+                coffeeBeans -= 20;
+                cups -= 1;
+                change += 7;
+                break;
+            case 3: water -= 200;
+                milk -= 100;
+                coffeeBeans -= 12;
+                cups -= 1;
+                change += 6;
+                break;
+            default: break;
+        }
     }
 
     public static void printCoffeeMachineState(int water, int milk, int coffeeBeans, int cups, int change) {
