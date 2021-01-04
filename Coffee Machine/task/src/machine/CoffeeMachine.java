@@ -1,9 +1,6 @@
 package machine;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class CoffeeMachine {
     private static int water = 400;
@@ -15,23 +12,33 @@ public class CoffeeMachine {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
-        printCoffeeMachineState(water, milk, coffeeBeans, cups, change);
-        System.out.println("Write action (buy, fill, take):");
-        String action = sc.nextLine();
+        String action = actionInput(sc);
+        System.out.println();
 
-        switch (action) {
-            case "buy": buyCoffee(sc);
-                        System.out.println();
-                        printCoffeeMachineState(water, milk, coffeeBeans, cups, change);
-                        break;
-            case "fill": refillCoffeeMachine(sc);
-                         printCoffeeMachineState(water, milk, coffeeBeans, cups, change);
-                         break;
-            case "take": collectMoney();
-                         printCoffeeMachineState(water, milk, coffeeBeans, cups, change);
-                         break;
-            default: break;
+        while (!action.equals("exit")) {
+            switch (action) {
+                case "buy":
+                    buyCoffee(sc);
+                    break;
+                case "fill":
+                    refillCoffeeMachine(sc);
+                    break;
+                case "take":
+                    collectMoney();
+                    break;
+                case "remaining":
+                    printCoffeeMachineState(water, milk, coffeeBeans, cups, change);
+                    break;
+                default: break;
+            }
+            action = actionInput(sc);
+            System.out.println();
         }
+    }
+
+    public static String actionInput(Scanner sc) {
+        System.out.println("Write action (buy, fill, take, remaining, exit):");
+        return sc.nextLine();
     }
 
     public static void collectMoney() {
@@ -49,6 +56,8 @@ public class CoffeeMachine {
         int coffeeBeansRefill = sc.nextInt();
         System.out.println("Write how many disposable cups of coffee do you want to add:");
         int cupsRefill = sc.nextInt();
+        sc.nextLine();
+        System.out.println();
 
         List<Integer> refillList = new ArrayList<>();
         refillList.add(waterRefill);
@@ -63,28 +72,36 @@ public class CoffeeMachine {
     }
 
     public static void buyCoffee(Scanner sc) {
-        System.out.println("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino");
-        int selection = sc.nextInt();
+        System.out.println("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino, back - to main menu:");
+        String selection = sc.nextLine();
+        String missingResource = checkIfEnoughResources(selection);
 
-        switch (selection) {
-            case 1: water -= 250;
-                coffeeBeans -= 16;
-                cups -= 1;
-                change += 4;
-                break;
-            case 2: water -= 350;
-                milk -= 75;
-                coffeeBeans -= 20;
-                cups -= 1;
-                change += 7;
-                break;
-            case 3: water -= 200;
-                milk -= 100;
-                coffeeBeans -= 12;
-                cups -= 1;
-                change += 6;
-                break;
-            default: break;
+        if (missingResource.equals("none")) {
+            System.out.println("I have enough resources, making you a coffee!");
+            System.out.println();
+            switch (selection) {
+                case "1": water -= 250;
+                    coffeeBeans -= 16;
+                    cups -= 1;
+                    change += 4;
+                    break;
+                case "2": water -= 350;
+                    milk -= 75;
+                    coffeeBeans -= 20;
+                    cups -= 1;
+                    change += 7;
+                    break;
+                case "3": water -= 200;
+                    milk -= 100;
+                    coffeeBeans -= 12;
+                    cups -= 1;
+                    change += 6;
+                    break;
+                case "back": break;
+            }
+        } else {
+            System.out.println("Sorry, not enough " + missingResource + "!");
+            System.out.println();
         }
     }
 
@@ -98,31 +115,76 @@ public class CoffeeMachine {
         System.out.println();
     }
 
-    public static void checkIfEnoughResourcesForCoffeeNeeded(int cupsOfCoffeeNeeded, int remainingWater,
-                                                             int remainingMilk, int remainingCoffeeBeans) {
-        int cupsFromWater = remainingWater / 200;
-        int cupsFromMilk = remainingMilk / 50;
-        int cupsFromBeans = remainingCoffeeBeans / 15;
+    public static String checkIfEnoughResources(String selection) {
+        int espressoWater = 250;
+        int espressoBeans = 16;
+        int latteWater = 350;
+        int latteMilk = 75;
+        int latteBeans = 20;
+        int cappuccinoWater = 200;
+        int cappuccinoMilk = 100;
+        int cappuccinoBeans = 12;
 
-        List<Integer> list = new ArrayList<>();
-        list.add(cupsFromWater);
-        list.add(cupsFromMilk);
-        list.add(cupsFromBeans);
+        int waterResource = 0;
+        int milkResource = 0;
+        int beanResources = 0;
+        int cupResource = 0;
 
-        int min = Collections.min(list);
-
-        if (min == cupsOfCoffeeNeeded) {
-            System.out.println("Yes, I can make that amount of coffee");
-        } else if (min > cupsOfCoffeeNeeded){
-            int excessCups = min - cupsOfCoffeeNeeded;
-            System.out.println("Yes, I can make that amount of coffee (and even " + excessCups +
-                " more than that");
-        } else {
-            System.out.println("No, I can make only " + min + " cup(s) of coffee");
+        switch (selection) {
+            case "1":
+                milkResource = 1;
+                if (water / espressoWater >= 1) {
+                    waterResource = 1;
+                }
+                if (coffeeBeans / espressoBeans >= 1) {
+                    beanResources = 1;
+                }
+                if (cups >= 1) {
+                    cupResource = 1;
+                }
+            case "2":
+                if (water / latteWater >= 1) {
+                    waterResource = 1;
+                }
+                if (milk / latteMilk >= 1) {
+                    milkResource = 1;
+                }
+                if (coffeeBeans / latteBeans >= 1) {
+                    beanResources = 1;
+                }
+                if (cups >= 1) {
+                    cupResource = 1;
+                }
+            case "3":
+                if (water / cappuccinoWater >= 1) {
+                    waterResource = 1;
+                }
+                if (milk / cappuccinoMilk >= 1) {
+                    milkResource = 1;
+                }
+                if (coffeeBeans / cappuccinoBeans >= 1) {
+                    beanResources = 1;
+                }
+                if (cups >= 1) {
+                    cupResource = 1;
+                }
+            default: break;
         }
+
+        Map<String, Integer> list = new HashMap<>();
+        list.put("water", waterResource);
+        list.put("milk", milkResource);
+        list.put("coffee beans", beanResources);
+        list.put("cups", cupResource);
+        for (Map.Entry<String, Integer> entry : list.entrySet()) {
+            if (Objects.equals(0, entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return "none";
     }
 
-    public static void calculateIngredients(int cupsOfCoffeeNeeded) {
+    /*public static void calculateIngredients(int cupsOfCoffeeNeeded) {
         System.out.println(waterNeeded(cupsOfCoffeeNeeded) + " ml of water");
         System.out.println(milkNeeded(cupsOfCoffeeNeeded) + " ml of milk");
         System.out.println(beansNeeded(cupsOfCoffeeNeeded) + " g of coffee beans");
@@ -148,5 +210,5 @@ public class CoffeeMachine {
         System.out.println("Pouring coffee into the cup");
         System.out.println("Pouring some milk into the cup");
         System.out.println("Coffee is ready!");
-    }
+    }*/
 }
